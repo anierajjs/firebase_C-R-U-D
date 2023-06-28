@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<head>
+    <title>READ, WRITE, UPDATE, DELETE Data</title>
+    <style>
+        label{display: inline-block; width:120px}
+        input,select{width:120px}
+    </style>
+</head>
+
+<body>
+    
+    <label>Name</label> <input id="NameBox" type="text"> <br><br>
+    <label>Student Number</label> <input id="StudBox" type="text"> <br><br>
+    <label>Section</label> <input id="SecBox" type="text"> <br><br>
+    <label>Gender</label>
+    <select id="GenBox">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+    </select>
+
+    <hr>
+    <button id="Insbtn">INSERT</button>
+    <button id="Selbtn">SELECT</button>
+    <button id="Updbtn">UPDATE</button>
+    <button id="Delbtn">DELETE</button>
+
+<!--IMPORTS + CONFIGURATION-->
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBgN1UrxduLfySBPt4MsnO85HC8Ur9wNck",
+          authDomain: "sampleproj-9499a.firebaseapp.com",
+          projectId: "sampleproj-9499a",
+          storageBucket: "sampleproj-9499a.appspot.com",
+          messagingSenderId: "416337159388",
+          appId: "1:416337159388:web:789c898bd1d56d63770019"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        import {
+            getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, deleteField
+        }
+        from "https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.js"
+
+        const db = getFirestore();
+
+
+        //--ADDING DOCUMENT--//
+        async function AddDocument_AutoID(){
+            var ref = collection(db, "TheStudentsList");
+
+            const docref = await addDoc (
+                ref, {
+                NameofStd: NameBox.value,
+                StudentNumber: StudBox.value,
+                Section: SecBox.value,
+                Gender: GenBox.value,
+                }
+            )
+            .then(()=>{
+                alert("data added successfully");
+            }
+            )
+            .catch((error)=>{
+                alert("unsuccessful operation. error:"+ error);
+            }
+            );
+        }
+
+        async function AddDocument_CustomID(){
+            var ref = doc(db, "TheStudentsList", StudBox.value);
+
+            const docref = await setDoc (
+                ref, {
+                NameofStd: NameBox.value,
+                StudentNumber: StudBox.value,
+                Section: SecBox.value,
+                Gender: GenBox.value,
+                }
+            )
+            .then(()=>{
+                alert("data added successfully");
+            }
+            )
+            .catch((error)=>{
+                alert("unsuccessful operation. error:"+ error);
+            }
+            );
+        }
+
+        //--GETTING DOCUMENT--//
+        async function GetADocument(){
+            var ref = doc(db, "TheStudentsList", StudBox.value);
+            const docSnap = await getDoc(ref);
+
+            if(docSnap.exists()){
+                NameBox.value = docSnap.data().NameofStd;
+                SecBox.value = docSnap.data().Section;
+                GenBox.value = docSnap.data().Gender;
+            }
+            else{
+                alert("No such document");
+            }
+        }
+
+        //--UPDATING DOCUMENT--//
+        async function UpdateFieldsInADocument(){
+            var ref = doc(db, "TheStudentsList", StudBox.value);
+
+            const docref = await updateDoc (
+                ref, {
+                NameofStd: NameBox.value,
+                Section: SecBox.value,
+                Gender: GenBox.value,
+                }
+            )
+            .then(()=>{
+                alert("data added successfully");
+            }
+            )
+            .catch((error)=>{
+                alert("unsuccessful operation. error:"+ error);
+            }
+            );
+        }
+
+        //--DELETING DOCUMENT--//
+        async function DeleteDocument(){
+            var ref = doc(db, "TheStudentsList", StudBox.value);
+            const docSnap = await getDoc(ref);
+
+            if(!docSnap.exists()){
+                alert("Document doesn't exist");
+                return;
+            }
+            await deleteDoc(ref)
+            .then(()=>{
+                alert("data deleted successfully");
+            })
+            .catch((error)=>{
+                alert("Unsuccessful operation, error:"+ error);
+            }
+            );
+
+        }
+
+
+
+
+        //--Assign Events To btns-->
+        Insbtn.addEventListener("click", AddDocument_CustomID);
+        Selbtn.addEventListener("click", GetADocument);
+        Updbtn.addEventListener("click", UpdateFieldsInADocument);
+        Delbtn.addEventListener("click", DeleteDocument);
+
+
+
+      </script>
+
+</body>
+
+</html>
